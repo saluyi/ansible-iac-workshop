@@ -41,7 +41,7 @@
     - name: Using AWX Survey for AB_Test_Percentage in nginx.conf
       ansible.builtin.replace:
         path: "{{ nginx_conf_file }}"
-        regexp: '100%'
+        regexp: '80%'
         replace: "{{ AB_Test_Percentage }}"
       notify: Restart Nginx container
 
