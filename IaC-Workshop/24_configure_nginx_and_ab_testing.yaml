@@ -50,4 +50,4 @@
       ansible.builtin.docker_container:
         name: "{{ nginx_container_name }}"
         state: started
-        restart_policy: always
+        restart_policy: "always"
