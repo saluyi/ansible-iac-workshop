@@ -1,0 +1,13 @@
+---
+- hosts: all
+  gather_facts: no
+  
+  tasks:
+    - name: Check disk usage
+      command:
+        cmd: df -h
+      register: linuxdf
+
+    - name: Print disk usage
+      debug:
+        msg: "{{ linuxdf.stdout_lines }}"

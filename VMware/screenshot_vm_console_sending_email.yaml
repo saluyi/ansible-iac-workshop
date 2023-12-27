@@ -1,0 +1,51 @@
+# =======================================================================
+# Version:          v1 - September 7,2020
+# Author:           Weithenn Wang (weithenn at weithenn.org)
+# Lab Environment:  Ansible AWX 14.1.0
+#                   vCenter Server 7.0
+# description:      Clone VM from template
+# =======================================================================
+
+---
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  vars:
+    datacenter: 'Datacenter'
+    cluster: 'Cluster'
+    folder_name: 'Windows-VMs'
+    vm_name: 'WS2019'
+    screenshot_path: '/tmp/WS2019.png'
+
+  tasks:
+    - name: Take a screenshot of the virtual machine console
+      vmware_guest_screenshot:
+        validate_certs: no
+        hostname: '{{ lookup("env", "VMWARE_HOST") }}'
+        username: '{{ lookup("env", "VMWARE_USER") }}'
+        password: '{{ lookup("env", "VMWARE_PASSWORD") }}'
+        datacenter: "{{ datacenter }}"
+        folder: "{{ folder_name }}"
+        name: "{{ vm_name }}"
+        local_path: "{{ screenshot_path }}"
+      register: take_screenshot
+
+    - name: Print take a screenshot of the virtual machine console result
+      debug:
+        var: take_screenshot
+    
+    - name: Sending an e-mail using Gmail SMTP servers
+      mail:
+        host: smtp.gmail.com
+        port: 587
+        username: "{{ Gmail_address }}"
+        password: "{{ Gmail_password}}"
+        to: Weithenn Wang <weithenn@weithenn.org>
+        subject: Take a screenshot of the "{{ vm_name }}" virtual machine console
+        body: System "{{ vm_name }}" has been successfully screenshotted.
+        attach: "{{ screenshot_path }}"
+      register: sending_email
+
+    - name: Print sending an e-mail result
+      debug:
+        var: sending_email

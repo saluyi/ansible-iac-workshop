@@ -1,0 +1,41 @@
+# =======================================================================
+# Version:          v1 - September 7,2020
+# Author:           Weithenn Wang (weithenn at weithenn.org)
+# Lab Environment:  Ansible AWX 14.1.0
+#                   vCenter Server 7.0
+# description:      Clone VM from template
+# =======================================================================
+
+---
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  vars:
+    datacenter: 'Datacenter'
+    cluster: 'Cluster'
+    folder_name: 'Windows-VMs'
+    vm_name: 'WS2019'
+    template_name: 'WS2019-Template'
+    portgroup_name: 'VM Network'
+
+  tasks:
+    - name: Clone a VM from template
+      vmware_guest:
+        validate_certs: no
+        hostname: '{{ lookup("env", "VMWARE_HOST") }}'
+        username: '{{ lookup("env", "VMWARE_USER") }}'
+        password: '{{ lookup("env", "VMWARE_PASSWORD") }}'
+        datacenter: "{{ datacenter }}"
+        cluster: "{{ cluster }}"
+        folder: "{{ folder_name }}"
+        name: "{{ vm_name }}"
+        template: "{{ template_name }}"
+        state: poweredon
+        networks:
+          - name: "{{ portgroup_name }}"
+        wait_for_ip_address: yes
+      register: deploy_vm
+
+    - name: Print deploy vm result
+      debug:
+        var: deploy_vm
